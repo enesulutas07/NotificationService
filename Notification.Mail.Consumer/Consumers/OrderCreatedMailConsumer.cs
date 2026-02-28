@@ -1,7 +1,7 @@
 using ECommerce.Shared.Events;
 using MassTransit;
 using Microsoft.Extensions.Logging;
-using Notification.Mail.Consumer.Services;
+using Notification.Mail.Service;
 
 namespace Notification.Mail.Consumer.Consumers;
 

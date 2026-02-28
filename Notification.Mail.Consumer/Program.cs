@@ -4,7 +4,7 @@ using Serilog;
 using Serilog.Sinks.Elasticsearch;
 using Notification.Mail.Consumer.Consumers;
 using Notification.Data;
-using Notification.Mail.Consumer.Services;
+using Notification.Mail.Service;
 
 var builder = Host.CreateApplicationBuilder(args);
 

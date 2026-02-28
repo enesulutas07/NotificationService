@@ -29,6 +29,7 @@
     <ProjectReference Include="..\ECommerce.Shared\ECommerce.Shared.csproj" />
     <ProjectReference Include="..\Notification.Data\Notification.Data.csproj" />
     <ProjectReference Include="..\Notification.Entity\Notification.Entity.csproj" />
+    <ProjectReference Include="..\Notification.Mail.Service\Notification.Mail.Service.csproj" />
   </ItemGroup>
 
   <ItemGroup>

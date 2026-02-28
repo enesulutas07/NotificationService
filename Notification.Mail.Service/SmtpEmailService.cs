@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Notification.Data;
@@ -6,7 +5,7 @@ using Notification.Entity;
 using System.Net;
 using System.Net.Mail;
 
-namespace Notification.Mail.Consumer.Services;
+namespace Notification.Mail.Service;
 
 public class SmtpEmailService : IEmailService
 {
@@ -29,7 +28,7 @@ public class SmtpEmailService : IEmailService
         var enableSsl = smtpSection.GetValue("EnableSsl", false);
         var userName = smtpSection.GetValue<string>("UserName");
         var password = smtpSection.GetValue<string>("Password");
-        var fromAddress = smtpSection.GetValue<string>("FromAddress") ?? "no-reply@ecommerce.local";
+        var fromAddress = smtpSection.GetValue<string>("FromAddress") ?? throw new InvalidOperationException("Smtp:FromAddress configuration is required.");
 
         var toAddress = email;
 
@@ -49,9 +48,6 @@ public class SmtpEmailService : IEmailService
             IsSuccess = false
         };
 
-        _dbContext.EmailNotifications.Add(notification);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-
         try
         {
             using var client = new SmtpClient(host, port)
@@ -59,22 +55,20 @@ public class SmtpEmailService : IEmailService
                 EnableSsl = enableSsl
             };
 
-
             client.Credentials = new NetworkCredential(userName, password);
 
-            using var message = new MailMessage(fromAddress, toAddress, subject, body);
+            var message = new MailMessage(fromAddress, toAddress, subject, body);
 
-            //await client.SendMailAsync(message, cancellationToken);
+            await client.SendMailAsync(message, cancellationToken);
 
             notification.IsSuccess = true;
             notification.SentAt = DateTime.UtcNow;
+            _dbContext.EmailNotifications.Add(notification);
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "OrderCreated email gönderimi başarısız oldu. OrderId: {OrderId}, UserId: {UserId}, Email: {Email}", orderId, userId, email);
-            //notification.ErrorMessage = ex.Message;
-            //await _dbContext.SaveChangesAsync(cancellationToken);
             throw;
         }
     }
